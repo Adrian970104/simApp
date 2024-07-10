@@ -166,17 +166,17 @@ export class AppComponent {
           };
         }
       }
-
     }
 
-    // Fill color for B1 and B2
-    //worksheet.getCell('B1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'CCCCCC' } };
-    //worksheet.getCell('B2').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'CCCCCC' } };
-
+    for(let i = 1; i<6; i++)
+    {
+      worksheet.getColumn(i).width = 12;
+    }
+    worksheet.getColumn(6).width = 24;
+    
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/octet-stream' });
-    saveAs(blob, 'Jelenléti.xlsx');
-
+    saveAs(blob, nameInputValue + 'Jelenléti.xlsx');
   }
 
 }
