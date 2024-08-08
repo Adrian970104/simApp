@@ -49,7 +49,7 @@ import { Console } from "node:console";
       <br />
       <br />
       <label for="dayOff">Szabadnapok, ünnepnapok:</label>
-      <input id="dayOffInput" type="text" name="dayOff" />
+      <input id="dayOffInput" type="text" name="dayOff" placeholder="pl.: 15,18" />
       <br />
       <br />
       <label for="companySelect">Cég:</label>
@@ -155,15 +155,14 @@ export class AppComponent {
       "Szombat",
       "Vasárnap",
     ];
-    const firstDayIndex = daysHu.indexOf(
+    const firstDayIndex = daysHu.findIndex( day => day.toLocaleLowerCase() ===
       this.getFirstDayName(this.selectedDate)
     );
+    console.log(firstDayIndex);
 
-    let monthDayCountInputValue = new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth() + 1, 0).getDate();
-    console.log(this.selectedDate.getFullYear(), " / ",  this.selectedDate.getMonth()+1);
-    console.log(monthDayCountInputValue);
+    let monthDays = new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth() + 1, 0).getDate();
 
-    for (let i = 1; i <= monthDayCountInputValue; i++) {
+    for (let i = 1; i <= monthDays; i++) {
       var row = i + 4;
       var rowSt = row.toString();
       //Napok sorszáma
@@ -205,7 +204,7 @@ export class AppComponent {
       }
 
       //Középre igazítás
-      for (let row = 1; row <= monthDayCountInputValue + 4; row++) {
+      for (let row = 1; row <= monthDays + 4; row++) {
         for (let col = 1; col <= 6; col++) {
           var cell = worksheet.getCell(row, col);
           cell.alignment = {
@@ -248,6 +247,8 @@ export class AppComponent {
   }
 
   getFirstDayName(date: Date) {
-    return date.toLocaleDateString("hu-HU", { weekday: "long" });
+    var a = date.toLocaleDateString("hu-HU", { weekday: "long" });
+    console.log(a);
+    return a;
   }
 }
