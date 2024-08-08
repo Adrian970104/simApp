@@ -49,7 +49,12 @@ import { Console } from "node:console";
       <br />
       <br />
       <label for="dayOff">Szabadnapok, ünnepnapok:</label>
-      <input id="dayOffInput" type="text" name="dayOff" placeholder="pl.: 15,18" />
+      <input
+        id="dayOffInput"
+        type="text"
+        name="dayOff"
+        placeholder="pl.: 15,18"
+      />
       <br />
       <br />
       <label for="companySelect">Cég:</label>
@@ -71,7 +76,75 @@ import { Console } from "node:console";
 
     <router-outlet />
   `,
-  styles: [],
+  styles: [
+    `
+      div {
+        max-width: 500px;
+        margin-top: 20px;
+        margin-right: auto;
+        margin-left: auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        font-family: Arial, sans-serif;
+        margin-bottom: 20px;
+      }
+
+      label {
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        color: #333;
+        margin-bottom: 5px;
+        display: block;
+      }
+
+      input[type="text"],
+      select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+      }
+
+      mat-form-field {
+        width: 100%;
+        margin-bottom: 16px;
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-family: Arial, sans-serif;
+        cursor: pointer;
+        margin-top: 20px;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      p {
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        color: #333;
+        margin-bottom: 5px;
+      }
+    `,
+  ],
 })
 export class AppComponent {
   async generateXlsx() {
@@ -155,12 +228,17 @@ export class AppComponent {
       "Szombat",
       "Vasárnap",
     ];
-    const firstDayIndex = daysHu.findIndex( day => day.toLocaleLowerCase() ===
-      this.getFirstDayName(this.selectedDate)
+    const firstDayIndex = daysHu.findIndex(
+      (day) =>
+        day.toLocaleLowerCase() === this.getFirstDayName(this.selectedDate)
     );
     console.log(firstDayIndex);
 
-    let monthDays = new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth() + 1, 0).getDate();
+    let monthDays = new Date(
+      this.selectedDate.getFullYear(),
+      this.selectedDate.getMonth() + 1,
+      0
+    ).getDate();
 
     for (let i = 1; i <= monthDays; i++) {
       var row = i + 4;
