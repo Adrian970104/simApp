@@ -308,7 +308,7 @@ export class AppComponent {
     //Xlsx letöltés
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: "application/octet-stream" });
-    saveAs(blob, nameInputValue + "Jelenléti.xlsx");
+    saveAs(blob, nameInputValue + " jelenléti "+this.dateStr.split(',')[1].trim()+".xlsx");
   }
 
   dateStr: string = "";
