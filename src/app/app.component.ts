@@ -71,7 +71,10 @@ import { Console } from "node:console";
       </select>
       <br />
       <br />
-      <button (click)="generateXlsx()">Jelenléti ív letöltése</button>
+      <button (click)="downloadPdf()">Jelenléti ív letöltése</button>
+      <br />
+      <br />
+      <button (click)="openPdf()">Jelenléti ív megnyitása</button>
     </div>
 
     <router-outlet />
@@ -147,7 +150,7 @@ import { Console } from "node:console";
   ],
 })
 export class AppComponent {
-  async generateXlsx() {
+  async getBlob() {
     const nameInputValue = (
       document.getElementById("nameInput") as HTMLInputElement
     ).value;
@@ -305,10 +308,26 @@ export class AppComponent {
     }
     worksheet.getColumn(6).width = 24;
 
+    
     //Xlsx letöltés
     const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: "application/octet-stream" });
-    saveAs(blob, nameInputValue + " jelenléti "+this.dateStr.split(',')[1].trim()+".xlsx");
+    return new Blob([buffer], { type: "application/octet-stream" });
+  }
+
+  async downloadPdf()
+  {
+    const blob = this.getBlob();
+    const nameInputValue = (
+      document.getElementById("nameInput") as HTMLInputElement
+    ).value;
+    saveAs(await blob, nameInputValue + " jelenléti "+this.dateStr.split(',')[1].trim()+".xlsx");
+  }
+
+  async openPdf()
+  {
+    const blob = this.getBlob();
+    var fileURL = URL.createObjectURL(await blob);
+    window.open(fileURL, '_blank');
   }
 
   dateStr: string = "";
