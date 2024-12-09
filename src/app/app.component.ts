@@ -311,7 +311,14 @@ export class AppComponent {
     
     //Xlsx letöltés
     const buffer = await workbook.xlsx.writeBuffer();
-    return new Blob([buffer], { type: "application/octet-stream" });
+    var data = new Array(buffer);
+    var byteNumbers = new Array(data.length);
+    for (var i = 0; i < data.length; i++) {
+        byteNumbers[i] = data[i];
+    }
+    var byteArray = new Uint8Array(byteNumbers);
+
+    return new Blob([byteArray], { type: "application/pdf" });
   }
 
   async downloadPdf()
