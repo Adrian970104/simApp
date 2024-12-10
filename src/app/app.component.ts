@@ -7,8 +7,10 @@ import { MatNativeDateModule } from "@angular/material/core";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { CommonModule } from "@angular/common";
-import { ReactiveFormsModule, FormControl } from "@angular/forms";
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { ReactiveFormsModule } from "@angular/forms";
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+pdfMake.vfs = pdfFonts.vfs;
 
 @Component({
   selector: "app-root",
@@ -75,7 +77,7 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
       <button (click)="downloadXlsx()">Jelenléti ív letöltése</button>
       <br />
       <br />
-      <button (click)="openPdf()">Jelenléti ív megnyitása</button>
+      <button (click)="printPdf()">Jelenléti ív nyomtatása</button>
     </div>
 
     <router-outlet />
@@ -153,7 +155,7 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 export class AppComponent {
 
-  async getWb() {
+  createWorkbook() {
 
     const nameInputValue = (
       document.getElementById("nameInput") as HTMLInputElement
@@ -176,7 +178,7 @@ export class AppComponent {
     );
 
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("nameInputValue");
+    const worksheet = workbook.addWorksheet(nameInputValue);
 
     // Fejléc
     worksheet.mergeCells("A1:F1");
@@ -314,89 +316,29 @@ export class AppComponent {
     return workbook;
   }
 
-  async getBlob() {
-    const workbook = await this.getWb();
+  async downloadXlsx() {
+    const workbook = this.createWorkbook();
     const buffer = await workbook.xlsx.writeBuffer();
-
-    return new Blob([buffer], { type: "application/pdf" });
-  }
-
-  async downloadXlsx()
-  {
-    const blob = this.getBlob();
+    const blob = new Blob([buffer], { type: "application/pdf" });
     const nameInputValue = (
       document.getElementById("nameInput") as HTMLInputElement
     ).value;
-    saveAs(await blob, nameInputValue + " jelenléti "+this.dateStr.split(',')[1].trim()+".xlsx");
+    saveAs(blob, nameInputValue + " jelenléti " + this.dateStr.split(',')[1].trim() + ".xlsx");
   }
 
-  async openPdf()
-  {
-    var pdf = this.wbToU8A(await this.getWb());
-    const pdfBytes = (await pdf).save;
-    window.open(pdfBytes.toString(), '_blank');
+  createDocumentDefinition() {
+    var dd = {
+      content: [
+        'First paragraph',
+        'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines'
+      ]
+    }
+    return dd;
   }
 
-
-  async wbToU8A(workbook: ExcelJS.Workbook): Promise<PDFDocument> {
-    const pdfDoc = await PDFDocument.create();
-    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-    let page = pdfDoc.addPage();
-    let { width, height } = page.getSize();
-    let y = height - 50; // Start the content below the sheet name
-
-    workbook.eachSheet((worksheet) => {
-        const sheetName = worksheet.name;
-
-        page.drawText(sheetName, { x: 50, y: y, font: helveticaFont, size: 20, color: rgb(0, 0, 0) });
-
-        y -= 30; // Move down for the next row
-
-        var columnWidths: number[];
-        worksheet.eachRow((row) => {
-            row.eachCell((cell, colNumber) => {
-                const textWidth = helveticaFont.widthOfTextAtSize(cell.text, 12);
-                columnWidths[colNumber - 1] = Math.max(columnWidths[colNumber - 1] || 0, textWidth);
-            });
-        });
-
-        worksheet.eachRow((row, rowIndex) => {
-            let x = 50; // Start from the left margin
-
-            if (y < 50) { // If the current page is full, add a new page
-                page = pdfDoc.addPage();
-                ({ width, height } = page.getSize());
-                y = height - 50;
-            }
-
-            row.eachCell((cell, colNumber) => {
-                const textWidth = helveticaFont.widthOfTextAtSize(cell.text, 12);
-                const cellWidth = columnWidths[colNumber - 1] + 80;
-                const cellHeight = 20;
-
-                // Draw cell background
-                page.drawRectangle({
-                    x, y: y - cellHeight, width: cellWidth, height: cellHeight,
-                    color: rowIndex === 1 ? rgb(0.8, 0.8, 0.8) : rgb(1, 1, 1),
-                    borderColor: rgb(0, 0, 0),
-                    borderWidth: 1,
-                });
-
-                // Draw cell text
-                page.drawText(cell.text, {
-                    x: x + (cellWidth - textWidth) / 2, y: y - cellHeight / 2 - 6,
-                    font: helveticaFont, size: 12, color: rgb(0, 0, 0),
-                });
-
-                x += cellWidth; // Move to the right for the next cell
-            });
-
-            y -= 20; // Move down for the next row
-        });
-    });
-
-    return pdfDoc;
+  async printPdf() {
+    var dd = this.createDocumentDefinition();
+    pdfMake.createPdf(dd).print();
   }
 
   dateStr: string = "";
