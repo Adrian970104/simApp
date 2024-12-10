@@ -8,9 +8,9 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule } from "@angular/forms";
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.vfs;
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+(<any>pdfMake).addVirtualFileSystem(pdfFonts);
 
 @Component({
   selector: "app-root",
@@ -329,16 +329,56 @@ export class AppComponent {
   createDocumentDefinition() {
     var dd = {
       content: [
-        'First paragraph',
-        'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines'
-      ]
+        {
+          style: 'tableExample',
+          color: '#444',
+          table: {
+            widths: [200, 'auto', 'auto'],
+            headerRows: 2,
+            // keepWithHeaderRows: 1,
+            body: [
+              [{ text: 'Jelenléti ív', style: 'tableHeader', colSpan: 2, alignment: 'center' }, {}, {}],
+              [{ text: 'Header 1', style: 'tableHeader', alignment: 'center' }, { text: 'Header 2', style: 'tableHeader', alignment: 'center' }, { text: 'Header 3', style: 'tableHeader', alignment: 'center' }],
+              ['Sample value 1', 'Sample value 2', 'Sample value 3'],
+              [{ rowSpan: 3, text: 'rowSpan set to 3\nLorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor' }, 'Sample value 2', 'Sample value 3'],
+              ['', 'Sample value 2', 'Sample value 3'],
+              ['Sample value 1', 'Sample value 2', 'Sample value 3'],
+              ['Sample value 1', { colSpan: 2, rowSpan: 2, text: 'Both:\nrowSpan and colSpan\ncan be defined at the same time' }, ''],
+              ['Sample value 1', '', ''],
+            ]
+          }
+        }
+      ],
+      styles: {
+        jelenletiIv: {
+          fontSize: 14,
+          bold: true,
+          //margin: [0, 0, 0, 10]
+        },
+        subheader: {
+          fontSize: 16,
+          bold: true,
+          margin: [0, 10, 0, 5]
+        },
+        tableExample: {
+          margin: [0, 5, 0, 15]
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 13,
+          color: 'black'
+        }
+      },
+      defaultStyle: {
+        // alignment: 'justify'
+      }
     }
     return dd;
   }
 
   async printPdf() {
     var dd = this.createDocumentDefinition();
-    pdfMake.createPdf(dd).print();
+    pdfMake.createPdf(dd).open();
   }
 
   dateStr: string = "";
