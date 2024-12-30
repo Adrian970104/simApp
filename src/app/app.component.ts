@@ -8,7 +8,6 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule, FormControl } from "@angular/forms";
-import { Console } from "node:console";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -169,7 +168,7 @@ export class AppComponent {
     );
 
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("nameInputValue");
+    const worksheet = workbook.addWorksheet(nameInputValue);
 
     // Fejléc
     worksheet.mergeCells("A1:F1");
