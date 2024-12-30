@@ -47,26 +47,35 @@ import { ReactiveFormsModule, FormControl } from "@angular/forms";
       </mat-form-field>
       <br />
       <br />
-      <label for="dayOff">Szabadnapok, ünnepnapok:</label>
+      <label for="redLEtterDays">Ünnepnapok az adott hónapban:</label>
       <input
-        id="dayOffInput"
+        id="redLetterDays"
         type="text"
-        name="dayOff"
+        name="redLetterDays"
+        placeholder="pl.: 15,18"
+      />
+      <br />
+      <br />
+      <label for="freeDays">Szabadság:</label>
+      <input
+        id="freeDaysInput"
+        type="text"
+        name="freeDays"
         placeholder="pl.: 15,18"
       />
       <br />
       <br />
       <label for="companySelect">Cég:</label>
       <select id="companySelect">
-        <option value="Molnár-Kárpát Kft.">Molnár-Kárpát Kft.</option>
         <option value="KEGA-Kárpát Kft.">KEGA-Kárpát Kft.</option>
+        <option value="Molnár-Kárpát Kft.">Molnár-Kárpát Kft.</option>
       </select>
       <br />
       <br />
       <label for="workHoursSelect">Óraszám:</label>
       <select id="workHoursSelect">
-        <option value="4">4</option>
         <option value="8">8</option>
+        <option value="4">4</option>
       </select>
       <br />
       <br />
@@ -150,8 +159,11 @@ export class AppComponent {
     const nameInputValue = (
       document.getElementById("nameInput") as HTMLInputElement
     ).value;
-    const dayOffInputValue = (
-      document.getElementById("dayOffInput") as HTMLInputElement
+    const redLetterDaysValue = (
+      document.getElementById("redLetterDays") as HTMLInputElement
+    ).value;
+    const freeDaysInputValue = (
+      document.getElementById("freeDaysInput") as HTMLInputElement
     ).value;
     const companySelectValue = (
       document.getElementById("companySelect") as HTMLInputElement
@@ -161,7 +173,8 @@ export class AppComponent {
     ).value;
     console.log(
       nameInputValue,
-      dayOffInputValue,
+      freeDaysInputValue,
+      redLetterDaysValue,
       this.selectedDate,
       companySelectValue,
       workHoursSelectValue
@@ -252,11 +265,11 @@ export class AppComponent {
       const c = worksheet.getCell("C" + rowSt);
       const d = worksheet.getCell("D" + rowSt);
       const e = worksheet.getCell("E" + rowSt);
-      //Ünnepnapok, hétvégék (szürke)
+      //Ünnepnapok, hétvégék
       if (
         currentDayName === "Szombat" ||
         currentDayName === "Vasárnap" ||
-        dayOffInputValue.split(",").includes(i.toString())
+        redLetterDaysValue.split(",").includes(i.toString())
       ) {
         c.fill = {
           type: "pattern",
@@ -273,8 +286,14 @@ export class AppComponent {
           pattern: "solid",
           fgColor: { argb: "808080" },
         };
-      } else {
+        
+        //Szabadságok
+      } else if (freeDaysInputValue.split(",").includes(i.toString())) {
+        worksheet.mergeCells(c.address + ":" + e.address);
+        c.value = "Szabadság";
+
         //Munkaóra feliratok
+      } else {
         c.value = "8:00";
         d.value = workHoursSelectValue === "4" ? "12:00" : "16:30";
         e.value = workHoursSelectValue;
